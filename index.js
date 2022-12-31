@@ -141,14 +141,3 @@ app.get('/api/player', (req, res) => {
         }
     }
 });
-
-
-app.get('/api/team', (req, res) => {
-    res.status(200).send({
-        id: userId,
-        name: name,
-        age: age,
-        color: color
-    })
-
-})
