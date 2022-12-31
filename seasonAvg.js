@@ -1,0 +1,37 @@
+const mongoose = require('mongoose');
+
+const seasonAvgSchema = mongoose.Schema({
+    Year : String,
+    Player : String,
+    Pos : String,
+    Age : Number,
+    Tm : String,
+    G : Number,
+    GS : Number,
+    MP :Number,
+    FG : Number,
+    FGA : Number,
+    FGPer : Number,
+    ThreePoint : Number,
+    ThreePointAtt : Number,
+    ThreePointPer : Number,
+    TwoPoint : Number,
+    TwoPointAtt : Number,
+    TwoPointPer : Number,
+    EffFGPer : Number,
+    FT : Number,
+    FTA : Number,
+    FTPer : Number,
+    ORB : Number,
+    DRB : Number,
+    TRB : Number,
+    AST : Number,
+    STL : Number,
+    BLK : Number,
+    TOV : Number,
+    PF : Number,
+    PTS : Number,
+    PlayerAdditional : String,
+}, { collection: 'seasonAvg' });
+
+module.exports = mongoose.model("seasonAvg", seasonAvgSchema);
