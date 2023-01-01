@@ -12,6 +12,7 @@ app.listen(
 
 //mongoose
 const mongoose = require('mongoose');
+const player = require('./player');
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true});
 const db = mongoose.connection;
@@ -25,7 +26,6 @@ app.get('/api/player', (req, res) => {
 
     const queryId = req.query.id;
     const year = parseInt(req.query.year);
-    console.log(year)
     
     if(queryId === undefined){
         res.status(200).send({
@@ -62,20 +62,7 @@ app.get('/api/player', (req, res) => {
             
             if(queriedPlayers.length === 1) {
 
-                let playerObj = {
-                    PlayerId : queriedPlayers[0].PlayerAdditional,
-                    name : queriedPlayers[0].Player,
-                    BirthDate : queriedPlayers[0].BirthDate,
-                    position : queriedPlayers[0].Pos,
-                    playedFrom : queriedPlayers[0].From,
-                    playedTo : queriedPlayers[0].To,
-                    Weight : queriedPlayers[0].Weight,
-                    height : {
-                        feet : queriedPlayers[0].Feet,
-                        inches : queriedPlayers[0].Inches
-                    },
-                    Colleges : queriedPlayers[0].Colleges,
-                }
+                let playerObj = createPlayerObj(queriedPlayers[0]);
 
                 let seasonAverages = [];
 
@@ -92,50 +79,12 @@ app.get('/api/player', (req, res) => {
                     }
 
                 } else {
-
                     seasonAverages = await SeasonAvg.find({ PlayerAdditional : queriedPlayers[0].PlayerAdditional}).sort({Age : 1});
-
                 }
                     
                 let seasonsArr = [];
                 seasonAverages.forEach((season) => {
-                    let seasonObj = {
-                        season : season.Year,
-                        team : season.Tm,
-                        position : season.Pos,
-                        age : season.Age,
-                        gamesPlayed : season.G,
-                        gamesStarted : season.GS,
-                        avgMinutes :season.MP,
-
-                        avgFG : season.FG,
-                        avgFGA : season.FGA,
-                        FGpercentage : season.FGPer,
-
-                        avgTwoPointFG : season.TwoPoint,
-                        avgTwoPointFGA : season.TwoPointAtt,
-                        TwoPointFGpercentage : season.TwoPointPer,
-
-                        avgThreePointFG : season.ThreePoint,
-                        avgThreePointFGA : season.ThreePointAtt,
-                        ThreePointFGpercentage : season.ThreePointPer,
-
-                        eFGpercentage : season.EffFGPer,
-
-                        avgFT : season.FT,
-                        avgFTA : season.FTA,
-                        FTpercentage : season.FTPer,
-
-                        avgPTS : season.PTS,
-                        avgAST : season.AST,
-                        avgRB : season.TRB,
-                        avgORB : season.ORB,
-                        avgDRB : season.DRB,
-                        avgSTL : season.STL,
-                        avgBLK : season.BLK,
-                        avgTOV : season.TOV,
-                        avgPF : season.PF,
-                    };
+                    let seasonObj = createSeasonObj(season, "player");
                     seasonsArr.push(seasonObj);
                 })
                 
@@ -155,7 +104,7 @@ app.get('/api/player', (req, res) => {
                 let playerArr = [];
                 queriedPlayers.forEach((player) => {
                     playerObj = {
-                        PlayerId : player.PlayerAdditional,
+                        playerId : player.PlayerAdditional,
                         name : player.Player,
                         playedFrom : player.From,
                         playedTo : player.To,
@@ -164,9 +113,9 @@ app.get('/api/player', (req, res) => {
                 })
 
                 res.status(200).send({
-                    error: `multiple matches for ${queryId}`,
+                    error: `${[playerArr.length]} player matches for \'${queryId}\'.`,
+                    response: "please resend request with specific PayerId.",
                     matches: playerArr,
-                    response: "please resend request with specific PayerId"
                 })
                 return;
             }
@@ -176,3 +125,347 @@ app.get('/api/player', (req, res) => {
         }
     }
 });
+
+app.get('/api/team', (req, res) => {
+    const team = req.query.id;
+    const year = parseInt(req.query.year);
+    
+    const teamIdsObj = {
+        AND:"Anderson Packers",
+        ATL:"Atlanta Hawks",
+        BAL:"Baltimore Bullets (1963-1973)",
+        BLB:"Baltimore Bullets (1947-1955)",
+        BOS:"Boston Celtics",
+        BRK:"Brooklyn Nets",
+        BUF:"Buffalo Braves",
+        CAP:"Capital Bullets",
+        CHA:"Charlotte Bobcats",
+        CHH:"Charlotte Hornets (1989-2002)",
+        CHI:"Chicago Bulls",
+        CHO:"Charlotte Hornets (2014-2022)",
+        CHP:"Chicago Packers",
+        CHS:"Chicago Stags",
+        CHZ:"Chicago Zephyrs",
+        CIN:"Cincinnati Royals",
+        CLE:"Cleveland Cavaliers",
+        DAL:"Dallas Mavericks",
+        DEN:"Denver Nuggets (1976-2022)",
+        DET:"Detroit Pistons",
+        DNN:"Denver Nuggets (1949-1950)",
+        FTW:"Fort Wayne Pistons",
+        GSW:"Golden State Warriors",
+        HOU:"Houston Rockets",
+        IND:"Indiana Pacers",
+        INO:"Indianapolis Olympians",
+        KCK:"Kansas City Kings",
+        KCO:"Kansas City-Omaha Kings",
+        LAC:"Los Angeles Clippers",
+        LAL:"Los Angeles Lakers",
+        MEM:"Memphis Grizzlies",
+        MIA:"Miami Heat",
+        MIL:"Milwaukee Bucks",
+        MIN:"Minnesota Timberwolves",
+        MLH:"Milwaukee Hawks",
+        MNL:"Minneapolis Lakers",
+        NJN:"New Jersey Nets",
+        NOH:"New Orleans Hornets",
+        NOJ:"New Orleans Jazz",
+        NOK:"NO/Ok. City Hornets",
+        NOP:"New Orleans Pelicans",
+        NYK:"New York Knicks",
+        NYN:"New York Nets",
+        OKC:"Oklahoma City Thunder",
+        ORL:"Orlando Magic",
+        PHI:"Philadelphia 76ers",
+        PHO:"Phoenix Suns",
+        PHW:"Philadelphia Warriors",
+        POR:"Portland Trail Blazers",
+        ROC:"Rochester Royals",
+        SAC:"Sacramento Kings",
+        SAS:"San Antonio Spurs",
+        SDC:"San Diego Clippers",
+        SDR:"San Diego Rockets",
+        SEA:"Seattle SuperSonics",
+        SFW:"San Francisco Warriors",
+        SHE:"Sheboygan Red Skins",
+        STB:"St. Louis Bombers",
+        STL:"St. Louis Hawks",
+        SYR:"Syracuse Nationals",
+        TOR:"Toronto Raptors",
+        TRI:"Tri-Cities Blackhawks",
+        UTA:"Utah Jazz",
+        VAN:"Vancouver Grizzlies",
+        WAS:"Washington Wizards",
+        WAT:"Waterloo Hawks",
+        WSB:"Washington Bullets",
+        WSC:"Washington Capitols",
+    };
+
+    const teamsYears = {
+        AND:'1949-1949',
+        ATL:'1968-2021',
+        BAL:'1963-1972',
+        BLB:'1949-1954',
+        BOS:'1949-2021',
+        BRK:'2012-2021',
+        BUF:'1970-1977',
+        CAP:'1949-1950',
+        CHA:'2004-2013',
+        CHH:'1988-2001',
+        CHI:'1966-2021',
+        CHO:'2014-2021',
+        CHP:'1961-1961',
+        CHS:'1949-1949',
+        CHZ:'1962-1962',
+        CIN:'1957-1971',
+        CLE:'1970-2021',
+        DAL:'1980-2021',
+        DEN:'1976-2021',
+        DET:'1957-2021',
+        DNN:'1949-1949',
+        FTW:'1949-1956',
+        GSW:'1971-2021',
+        HOU:'1971-2021',
+        IND:'1976-2021',
+        INO:'1949-1952',
+        KCK:'1975-1984',
+        KCO:'1972-1974',
+        LAC:'1984-2021',
+        LAL:'1960-2021',
+        MEM:'2001-2021',
+        MIA:'1988-2021',
+        MIL:'1968-2021',
+        MIN:'1989-2021',
+        MLH:'1951-1954',
+        MNL:'1949-1959',
+        NJN:'1977-2011',
+        NOH:'2002-2012',
+        NOJ:'1974-1978',
+        NOK:'2005-2006',
+        NOP:'2013-2021',
+        NYK:'1949-2021',
+        NYN:'1976-1976',
+        OKC:'2008-2021',
+        ORL:'1989-2021',
+        PHI:'1963-2021',
+        PHO:'1968-2021',
+        PHW:'1949-1961',
+        POR:'1970-2021',
+        ROC:'1949-1956',
+        SAC:'1985-2021',
+        SAS:'1976-2021',
+        SDC:'1978-1983',
+        SDR:'1967-1970',
+        SEA:'1967-2007',
+        SFW:'1962-1970',
+        SHE:'1949-1949',
+        STB:'1949-1949',
+        STL:'1955-1967',
+        SYR:'1949-1962',
+        TOR:'1995-2021',
+        TRI:'1949-1950',
+        UTA:'1979-2021',
+        VAN:'1995-2000',
+        WAS:'1997-2021',
+        WAT:'1949-1949',
+        WSB:'1974-1996',
+        WSC:'1973-1973',
+    };
+
+    if (team === undefined){
+        res.status(200).send({
+            error: `must provide a team id. ex: 2000-2001 Los Angeles Lakers -> ?id=LAL&year=2000`,
+            response: "The following object provides the team id's for every queryable team:",
+            ids: teamIdsObj
+        })
+        return;
+    }
+
+    if(!teamIdsObj.hasOwnProperty(team.toUpperCase())){
+        res.status(200).send({
+            error: `${team} is not a valid team id`,
+            response: "The following object provides the team id's for every queryable team:",
+            ids: teamIdsObj
+        })
+        return;
+    }
+
+    if(req.query.year === undefined){
+        res.status(200).send({
+            error: `no year provided`,
+            response: "must provide a year to query, year must be a number between 1949 and 2021 inclusive. ex: 2000-2001 Los Angeles Lakers -> ?id=LAL&year=2000",
+        })
+        return;
+    }
+    
+    if(req.query.year !== undefined && ( isNaN(year) || (1949 > year || year > 2021) )){
+        res.status(200).send({
+            error: `${req.query.year} is an invalid year`,
+            response: "year must be a number between 1949 and 2021 inclusive. ex: 2000-2001 Los Angeles Lakers -> ?id=LAL&year=2000"
+        })
+        return;
+    }
+
+    getTeam();
+    async function getTeam() {
+        try{
+            const teamSeasonAvgs = await SeasonAvg.find({ Tm : team.toUpperCase(), Year : new RegExp( year + '-.*')});
+
+            if(teamSeasonAvgs.length === 0) {
+                res.status(200).send({
+                    error: `invalid year for ${teamIdsObj[team.toUpperCase()]}`,
+                    response: `${teamIdsObj[team.toUpperCase()]} have no record during the ${year}-${(year+1)} season, please try a year between ${teamsYears[team.toUpperCase()]}`
+                })
+                return;
+            }
+
+            let playersAvgs = [];
+            teamSeasonAvgs.forEach( (playerAvg) => {
+                let playerObj = createSeasonObj(playerAvg, "team");
+                playersAvgs.push(playerObj);
+            })
+
+            sortPlayersByLastName(playersAvgs);
+
+            res.status(200).send({
+                teamId: team.toUpperCase(),
+                team: teamIdsObj[team.toUpperCase()],
+                season: `${year}-${(year+1)}`,
+                playerAverages: playersAvgs
+            })
+            return;
+
+            
+        } catch(e) {
+            console.log(e);
+        }
+    }
+})
+
+function sortPlayersByLastName(playersAvgs) {
+    playersAvgs.forEach((playerAvg) => {
+        let lastName = playerAvg.name.split(' ').slice(1)[0];
+        playerAvg['lastName'] = lastName;
+    })
+    playersAvgs.sort((player1, player2) => {
+        if ( player1.lastName < player2.lastName ){
+            return -1;
+        }
+        if ( player1.lastName > player2.lastName ){
+            return 1;
+        }
+        return 0;
+    });
+    playersAvgs.forEach((playerAvg) => {
+        delete playerAvg.lastName;
+    })
+}
+
+function createPlayerObj(player) {
+    let playerObj = {
+        playerId : player.PlayerAdditional,
+        name : player.Player,
+        birthDate : player.BirthDate,
+        colleges : player.Colleges,
+        position : player.Pos,
+        playedFrom : player.From,
+        playedTo : player.To,
+        weight : player.Weight,
+        height : {
+            feet : player.Feet,
+            inches : player.Inches
+        },
+    }
+    return playerObj;
+}
+
+function createSeasonObj(season, type) {
+    let seasonObj = {};
+    let year = parseInt(season.Year.substring(0, 4));
+    if(type === "player"){
+        seasonObj["season"] = season.Year;
+        seasonObj["team"] = season.Tm;
+    } else if(type === "team"){
+        seasonObj["playerId"] = season.PlayerAdditional;
+        seasonObj["name"] = season.Player;
+    } else {
+        return {error: "incorrect type"}
+    }
+
+    let limit1980 = {};
+    let limit1979 = {};
+    let limit1976 = {}; 
+    let limit1972 = {}; 
+    let limit1950 = {};
+    let limit1949 = {};
+
+    if(year >1980){
+        limit1980 = {
+            gamesStarted : season.GS,
+        }
+    }
+    if(year > 1979){
+        limit1979 = {
+            avgThreePointFG : season.ThreePoint,
+            avgThreePointFGA : season.ThreePointAtt,
+            threePointFGpercentage : season.ThreePointPer,
+        };
+    }
+    if(year >1976){
+        limit1976 = {
+            avgTOV : season.TOV,
+        }; 
+    }
+    if(year >1972){
+        limit1972 = {
+            avgORB : season.ORB,
+            avgDRB : season.DRB,
+            avgSTL : season.STL,
+            avgBLK : season.BLK,
+        }; 
+    }
+    if(year >1950){
+        limit1950 = {
+            avgMinutes :season.MP,
+        };
+    }
+    if(year >1949){
+        limit1949 = {
+            avgRB : season.TRB,
+        };
+    }
+
+    let seasonObjFinal = {
+        ...seasonObj,
+        position : season.Pos,
+        age : season.Age,
+        gamesPlayed : season.G,
+        ...limit1980,
+        ...limit1950,
+
+        avgFG : season.FG,
+        avgFGA : season.FGA,
+        FGpercentage : season.FGPer,
+
+        ...limit1979,
+
+        avgTwoPointFG : season.TwoPoint,
+        avgTwoPointFGA : season.TwoPointAtt,
+        twoPointFGpercentage : season.TwoPointPer,
+
+        eFGpercentage : season.EffFGPer,
+
+        avgFT : season.FT,
+        avgFTA : season.FTA,
+        FTpercentage : season.FTPer,
+
+        avgPTS : season.PTS,
+        avgAST : season.AST,
+        ...limit1949,
+        ...limit1972,
+        ...limit1976,
+        avgPF : season.PF,
+    };
+    
+    return seasonObjFinal;
+}
