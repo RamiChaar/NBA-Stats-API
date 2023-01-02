@@ -302,7 +302,7 @@ async function getPlayers(req, res){
 
             res.status(409).send({
                 error: `${[playerArr.length]} player matches for \'${queryId}\'.`,
-                response: "please resend request with specific PayerId.",
+                response: "please resend request with specific PlayerId.",
                 matches: playerArr,
             })
             return;

@@ -173,7 +173,7 @@ Response (200):
 }
 ```
 
-### To request data on all players in a team during over selected season:
+### To request data on all players in a team over a selected season:
 
 Use the end point '/api/v1/team' with an id parameter as the team id, and a year parameter to select the season.
 
@@ -277,7 +277,7 @@ Response (409):
 ```
 {
   "error": "3 player matches for 'jonesda'.",
-  "response": "please resend request with specific PayerId.",
+  "response": "please resend request with specific PlayerId.",
   "matches": [
     {
       "playerId": "jonesda01",
