@@ -4,7 +4,7 @@ A RESTful API which retrieves data on NBA player statistics. Data includes gener
 
 Data does not include statistics from the ABA or BAA.
 
-### Sending API Requests and Response Examples
+## Sending API Requests and Response Examples
 
 ##### Definitions
 
@@ -303,7 +303,7 @@ In this case you must 'id=jonesda03' to query Damian Jones
 
 \*_Players with the same id have a numerical extension based on the order they played their first season_\*
 
-### Tools Used
+## Tools Used
 
 - VS Code
 - Node.js
@@ -311,6 +311,6 @@ In this case you must 'id=jonesda03' to query Damian Jones
 - MongoDB
 - Testing: Insomnia, MongoDB Compass
 
-### References
+## References
 
 Basketball Reference - https://www.basketball-reference.com
