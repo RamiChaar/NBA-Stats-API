@@ -157,7 +157,7 @@ const teamsYears = {
     WSC:'1973-1973',
 };
 
-app.get('/api/player', (req, res) => {
+app.get('/api/v1/player', (req, res) => {
 
     const queryId = req.query.id;
     const year = parseInt(req.query.year);
@@ -166,6 +166,14 @@ app.get('/api/player', (req, res) => {
         res.status(400).send({
             error: "no query id",
             response: "must provide query id in url, composed of first 5 letters of last name followed by first 2 letters of first name. ex: Michael Jordan -> ?id=jordami"
+        })
+        return;
+    }
+
+    if(queryId.length < 3){
+        res.status(400).send({
+            error: "invalid query id",
+            response: "please provide query id composed of first 5 letters of player's last name followed by first 2 letters of first name. ex: Michael Jordan -> ?id=jordami"
         })
         return;
     }
@@ -181,7 +189,7 @@ app.get('/api/player', (req, res) => {
     getPlayers(req, res);
 });
 
-app.get('/api/team', (req, res) => {
+app.get('/api/v1/team', (req, res) => {
     const team = req.query.id;
     const year = parseInt(req.query.year);
 
@@ -302,6 +310,7 @@ async function getPlayers(req, res){
 
     } catch(e) {
         console.log(e);
+        res.status(500).json({message : e.message});
     }
 }
 
@@ -338,6 +347,7 @@ async function getTeam(req, res) {
         
     } catch(e) {
         console.log(e);
+        res.status(500).json({message : e.message});
     }
 }
 
