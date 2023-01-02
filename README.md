@@ -10,7 +10,7 @@ Data does not include statistics from the ABA or BAA.
 
 player id: The first five letters of their first name followed by the first two letters of their last name.
 <br>
-team id: The three character abbreviation used to identify each team, a list can be found here.
+team id: The three character abbreviation used to identify each team, a list can be found [here](#my-multi-word-header).
 <br>
 year: The year in any given query is the year a chosen season begins, ex: 2003-2004 -> 2003
 
@@ -316,3 +316,74 @@ In this case you must 'id=jonesda03' to query Damian Jones
 ## References
 
 Basketball Reference - https://www.basketball-reference.com
+
+## Team List:
+
+    AND: Anderson Packers
+    ATL: Atlanta Hawks
+    BAL: Baltimore Bullets (1963-1973)
+    BLB: Baltimore Bullets (1947-1955)
+    BOS: Boston Celtics
+    BRK: Brooklyn Nets
+    BUF: Buffalo Braves
+    CAP: Capital Bullets
+    CHA: Charlotte Bobcats
+    CHH: Charlotte Hornets (1989-2002)
+    CHI: Chicago Bulls
+    CHO: Charlotte Hornets (2014-2022)
+    CHP: Chicago Packers
+    CHS: Chicago Stags
+    CHZ: Chicago Zephyrs
+    CIN: Cincinnati Royals
+    CLE: Cleveland Cavaliers
+    DAL: Dallas Mavericks
+    DEN: Denver Nuggets (1976-2022)
+    DET: Detroit Pistons
+    DNN: Denver Nuggets (1949-1950)
+    FTW: Fort Wayne Pistons
+    GSW: Golden State Warriors
+    HOU: Houston Rockets
+    IND: Indiana Pacers
+    INO: Indianapolis Olympians
+    KCK: Kansas City Kings
+    KCO: Kansas City-Omaha Kings
+    LAC: Los Angeles Clippers
+    LAL: Los Angeles Lakers
+    MEM: Memphis Grizzlies
+    MIA: Miami Heat
+    MIL: Milwaukee Bucks
+    MIN: Minnesota Timberwolves
+    MLH: Milwaukee Hawks
+    MNL: Minneapolis Lakers
+    NJN: New Jersey Nets
+    NOH: New Orleans Hornets
+    NOJ: New Orleans Jazz
+    NOK: NO/Ok. City Hornets
+    NOP: New Orleans Pelicans
+    NYK: New York Knicks
+    NYN: New York Nets
+    OKC: Oklahoma City Thunder
+    ORL: Orlando Magic
+    PHI: Philadelphia 76ers
+    PHO: Phoenix Suns
+    PHW: Philadelphia Warriors
+    POR: Portland Trail Blazers
+    ROC: Rochester Royals
+    SAC: Sacramento Kings
+    SAS: San Antonio Spurs
+    SDC: San Diego Clippers
+    SDR: San Diego Rockets
+    SEA: Seattle SuperSonics
+    SFW: San Francisco Warriors
+    SHE: Sheboygan Red Skins
+    STB: St. Louis Bombers
+    STL: St. Louis Hawks
+    SYR: Syracuse Nationals
+    TOR: Toronto Raptors
+    TRI: Tri-Cities Blackhawks
+    UTA: Utah Jazz
+    VAN: Vancouver Grizzlies
+    WAS: Washington Wizards
+    WAT: Waterloo Hawks
+    WSB: Washington Bullets
+    WSC: Washington Capitols
