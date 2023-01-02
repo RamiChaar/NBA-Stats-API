@@ -4,20 +4,17 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 app.use(express.json());
-app.listen(
-    PORT,
-    () => console.log(`live on http://localhost:${PORT}`)
-);
-
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true});
 const db = mongoose.connection;
 db.on('error', (error) => console.error(error));
+
+app.listen(PORT, () => console.log(`live on http://localhost:${PORT}`));
 db.once('open', () => console.log('Connected to Database'));
 
-const Player = require('./player');
-const SeasonAvg = require('./seasonAvg');
+const Player = require('./models/player');
+const SeasonAvg = require('./models/seasonAvg');
 
 const teamIdsObj = {
     AND:"Anderson Packers",
@@ -166,7 +163,7 @@ app.get('/api/player', (req, res) => {
     const year = parseInt(req.query.year);
     
     if(queryId === undefined){
-        res.status(200).send({
+        res.status(400).send({
             error: "no query id",
             response: "must provide query id in url, composed of first 5 letters of last name followed by first 2 letters of first name. ex: Michael Jordan -> ?id=jordami"
         })
@@ -174,7 +171,7 @@ app.get('/api/player', (req, res) => {
     }
 
     if( req.query.year !== undefined && ( isNaN(year) || (1949 > year || year > 2021) )){
-        res.status(200).send({
+        res.status(400).send({
             error: `${req.query.year} is an invalid year`,
             response: "year must be a number between 1949 and 2021 inclusive. ex: Larry Bird's 1981-1982 season -> ?id=birdla&year=1981"
         })
@@ -189,7 +186,7 @@ app.get('/api/team', (req, res) => {
     const year = parseInt(req.query.year);
 
     if (team === undefined){
-        res.status(200).send({
+        res.status(400).send({
             error: `must provide a team id. ex: 2000-2001 Los Angeles Lakers -> ?id=LAL&year=2000`,
             response: "The following object provides the team id's for every queryable team:",
             ids: teamIdsObj
@@ -198,7 +195,7 @@ app.get('/api/team', (req, res) => {
     }
 
     if(!teamIdsObj.hasOwnProperty(team.toUpperCase())){
-        res.status(200).send({
+        res.status(400).send({
             error: `${team} is not a valid team id`,
             response: "The following object provides the team id's for every queryable team:",
             ids: teamIdsObj
@@ -207,7 +204,7 @@ app.get('/api/team', (req, res) => {
     }
 
     if(req.query.year === undefined){
-        res.status(200).send({
+        res.status(400).send({
             error: `no year provided`,
             response: "must provide a year to query, year must be a number between 1949 and 2021 inclusive. ex: 2000-2001 Los Angeles Lakers -> ?id=LAL&year=2000",
         })
@@ -215,7 +212,7 @@ app.get('/api/team', (req, res) => {
     }
     
     if(req.query.year !== undefined && ( isNaN(year) || (1949 > year || year > 2021) )){
-        res.status(200).send({
+        res.status(400).send({
             error: `${req.query.year} is an invalid year`,
             response: "year must be a number between 1949 and 2021 inclusive. ex: 2000-2001 Los Angeles Lakers -> ?id=LAL&year=2000"
         })
@@ -234,7 +231,7 @@ async function getPlayers(req, res){
 
         if(queriedPlayers.length === 0) {
 
-            res.status(200).send({
+            res.status(404).send({
                 error: `no matches for ${queryId}`,
                 response: "query id composed of first 5 letters of last name followed by first 2 letters of first name. ex: Michael Jordan -> ?id=jordami"
             })
@@ -254,7 +251,7 @@ async function getPlayers(req, res){
                 seasonAverages = await SeasonAvg.find({ PlayerAdditional : queriedPlayers[0].PlayerAdditional, Year : new RegExp( year + '-.*')});
 
                 if(seasonAverages.length === 0){
-                    res.status(200).send({
+                    res.status(404).send({
                         error: `${playerObj.name} has no record during the ${year}-${(year+1)} season`,
                         response: `${playerObj.name} played between the seasons of ${queriedPlayers[0].From-1}-${queriedPlayers[0].From} and ${queriedPlayers[0].To-1}-${queriedPlayers[0].To}`,
                     })
@@ -295,7 +292,7 @@ async function getPlayers(req, res){
                 playerArr.push(playerObj)
             })
 
-            res.status(200).send({
+            res.status(409).send({
                 error: `${[playerArr.length]} player matches for \'${queryId}\'.`,
                 response: "please resend request with specific PayerId.",
                 matches: playerArr,
@@ -307,6 +304,7 @@ async function getPlayers(req, res){
         console.log(e);
     }
 }
+
 async function getTeam(req, res) {
     const team = req.query.id;
     const year = parseInt(req.query.year);
@@ -314,7 +312,7 @@ async function getTeam(req, res) {
         const teamSeasonAvgs = await SeasonAvg.find({ Tm : team.toUpperCase(), Year : new RegExp( year + '-.*')});
 
         if(teamSeasonAvgs.length === 0) {
-            res.status(200).send({
+            res.status(404).send({
                 error: `invalid year for ${teamIdsObj[team.toUpperCase()]}`,
                 response: `${teamIdsObj[team.toUpperCase()]} have no record during the ${year}-${(year+1)} season, please try a year between ${teamsYears[team.toUpperCase()]}`
             })
@@ -342,6 +340,7 @@ async function getTeam(req, res) {
         console.log(e);
     }
 }
+
 function createPlayerObj(player) {
     let playerObj = {
         playerId : player.PlayerAdditional,
@@ -359,6 +358,7 @@ function createPlayerObj(player) {
     }
     return playerObj;
 }
+
 function createSeasonObj(season, type) {
     let seasonObj = {};
     let year = parseInt(season.Year.substring(0, 4));
@@ -449,6 +449,7 @@ function createSeasonObj(season, type) {
     
     return seasonObjFinal;
 }
+
 function sortPlayersByLastName(playersAvgs) {
     playersAvgs.forEach((playerAvg) => {
         let lastName = playerAvg.name.split(' ').slice(1)[0];
