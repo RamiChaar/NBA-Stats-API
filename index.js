@@ -154,7 +154,7 @@ const teamsYears = {
     WAS:'1997-2021',
     WAT:'1949-1949',
     WSB:'1974-1996',
-    WSC:'1973-1973',
+    WSC:'1949-1950',
 };
 
 app.get('/api/v1/player', (req, res) => {
