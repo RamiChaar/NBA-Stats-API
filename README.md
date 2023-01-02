@@ -1,6 +1,6 @@
 # NBA-Stats-API
 
-A RESTful API which retrieves data on NBA player statistics. Data includes general player information, as well as season statistical averages for each season every player has played in. Data can be queried from all NBA seasons (1949-50 season the 2021-22) and from all NBA teams that exist and have existed in the past (68 total).
+A RESTful API which retrieves data on NBA player statistics. Data includes general player information, as well as season statistical averages for each season every player has played in. Data can be queried from all NBA seasons (1949-50 to 2021-22) and from all NBA teams that exist and have existed in the past (68 total).
 
 Data does not include statistics from the ABA or BAA.
 
