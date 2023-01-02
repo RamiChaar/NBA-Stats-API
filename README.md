@@ -9,7 +9,9 @@ Data does not include statistics from the ABA or BAA.
 #### Definitions
 
 player id: The first five letters of their first name followed by the first two letters of their last name.
+<br>
 team id: The three character abbreviation used to identify each team, a list can be found here.
+<br>
 year: The year in any given query is the year a chosen season begins, ex: 2003-2004 -> 2003
 
 #### To request all data on a player:
