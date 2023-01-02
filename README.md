@@ -6,13 +6,13 @@ Data does not include statistics from the ABA or BAA.
 
 ## Sending API Requests and Response Examples
 
-##### Definitions
+#### Definitions
 
 player id: The first five letters of their first name followed by the first two letters of their last name.
 team id: The three character abbreviation used to identify each team, a list can be found here.
 year: The year in any given query is the year a chosen season begins, ex: 2003-2004 -> 2003
 
-##### To request all data on a player:
+#### To request all data on a player:
 
 Use the end point '/api/v1/player' with an id parameter as their player id.
 
@@ -107,7 +107,7 @@ Response (200):
 }
 ```
 
-##### To request data on a players single season:
+#### To request data on a players single season:
 
 Use the end point '/api/v1/player' with an id parameter as their player id, and a year parameter to select the season.
 
@@ -171,7 +171,7 @@ Response (200):
 }
 ```
 
-##### To request data on all players in a team during over selected season:
+#### To request data on all players in a team during over selected season:
 
 Use the end point '/api/v1/team' with an id parameter as the team id, and a year parameter to select the season.
 
@@ -258,7 +258,7 @@ Response (200):
 }
 ```
 
-##### Additional Information
+#### Additional Information
 
 Conflicting player ID's: Some players have the same player id, in which case a 409 error will be caught and you will be provided multiple different ids to select from.
 
