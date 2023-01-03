@@ -301,7 +301,7 @@ Response (409):
 }
 ```
 
-In this case you must 'id=jonesda03' to query Damian Jones
+In this case you must use 'id=jonesda03' to query Damian Jones
 
 \*_Players with the same id have a numerical extension based on the order they played their first season_\*
 
